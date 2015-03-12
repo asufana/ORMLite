@@ -35,5 +35,15 @@ public class InspectionTest extends BaseTest {
         final List<Table> tables = inspection.tables();
         assertThat(tables.size(), is(1));
         assertThat(tables.get(0).tableName(), is("X"));
+        tables.forEach(System.out::println);
+    }
+    
+    @Test
+    public void testColumns() throws Exception {
+        final List<Table> tables = inspection.tables();
+        final Table table = tables.get(0);
+        final List<Column> columns = table.columns();
+        assertThat(columns.size(), is(2));
+        columns.forEach(System.out::println);
     }
 }

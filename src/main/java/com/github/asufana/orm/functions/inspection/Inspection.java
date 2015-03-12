@@ -8,9 +8,9 @@ import com.github.asufana.orm.functions.inspection.resources.*;
 
 public class Inspection {
     
-    private static final String CATALOG = null;
-    private static final String SCHEMA = null;
-    private static final String TABLE_NAME_PATTERN = "%";
+    public static final String CATALOG = null;
+    public static final String SCHEMA = null;
+    public static final String NAME_PATTERN = "%";
     private static final String[] TABLE_TYPES = null;
     
     private final Connection connection;
@@ -45,13 +45,15 @@ public class Inspection {
         try {
             try (final ResultSet rs = meta.getTables(CATALOG,
                                                      SCHEMA,
-                                                     TABLE_NAME_PATTERN,
+                                                     NAME_PATTERN,
                                                      TABLE_TYPES)) {
                 while (rs.next()) {
+                    //http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getTables%28java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String%5b%5d%29
                     if (rs.getString("TABLE_TYPE").equals("TABLE") == false) {
                         continue;
                     }
-                    tables.add(new Table(rs.getString("TABLE_CAT"),
+                    tables.add(new Table(meta,
+                                         rs.getString("TABLE_CAT"),
                                          rs.getString("TABLE_SCHEM"),
                                          rs.getString("TABLE_NAME"),
                                          rs.getString("TABLE_TYPE"),
