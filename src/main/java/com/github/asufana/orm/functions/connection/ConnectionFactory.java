@@ -53,7 +53,6 @@ public class ConnectionFactory {
     private void isDatabaseDriverExists(final String driverClassName) {
         try {
             Class.forName(driverClassName);
-            //Class.forName(driverClassName).newInstance();
         }
         catch (final ClassNotFoundException e) {
             throw new ORMLiteException(e);

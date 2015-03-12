@@ -1,7 +1,6 @@
 package com.github.asufana.orm;
 
 import java.sql.*;
-import java.util.*;
 
 import org.h2.tools.*;
 import org.junit.*;
@@ -33,13 +32,11 @@ public abstract class BaseTest {
     @AfterClass
     public static void AfterClass() throws SQLException {
         System.out.println("--------------");
-        connection.close();
+        if (connection.isClosed() != false) {
+            connection.close();
+        }
         System.out.println("Disconnect.");
         h2.stop();
         System.out.println("Database stop.");
-    }
-    
-    protected List<Object> toList(final String... params) {
-        return Arrays.asList(params);
     }
 }
