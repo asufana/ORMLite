@@ -27,12 +27,12 @@ public abstract class BaseTest {
                                               dbUser,
                                               dbPass);
         System.out.println("Connect.");
-        System.out.println("--------------");
+        System.out.println();
     }
     
     @AfterClass
     public static void AfterClass() throws SQLException {
-        System.out.println("--------------");
+        System.out.println();
         if (connection.isClosed() != false) {
             connection.close();
         }
