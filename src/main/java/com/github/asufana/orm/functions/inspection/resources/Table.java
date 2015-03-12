@@ -30,6 +30,7 @@ public class Table {
                                                 tableName(),
                                                 Inspection.NAME_PATTERN)) {
                 while (rs.next()) {
+                    //http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getColumns(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
                     columns.add(new Column(meta,
                                            rs.getString("TABLE_CAT"),
                                            rs.getString("TABLE_SCHEM"),

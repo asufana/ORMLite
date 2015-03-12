@@ -48,7 +48,7 @@ public class Inspection {
                                                      NAME_PATTERN,
                                                      TABLE_TYPES)) {
                 while (rs.next()) {
-                    //http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getTables%28java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String%5b%5d%29
+                    //http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getTables(java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
                     if (rs.getString("TABLE_TYPE").equals("TABLE") == false) {
                         continue;
                     }
