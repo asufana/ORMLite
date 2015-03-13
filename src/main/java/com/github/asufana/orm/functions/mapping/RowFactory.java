@@ -6,16 +6,18 @@ import java.util.*;
 
 import org.objenesis.*;
 
+import com.github.asufana.orm.*;
 import com.github.asufana.orm.exceptions.*;
 
 public class RowFactory {
     private static final Objenesis objenesis = new ObjenesisStd();
     
-    public static <T> RowList<T> create(final Class<T> klass, final ResultSet rs) {
+    public static <T> RowList<T> create(final EntityManager<T> em,
+                                        final ResultSet rs) {
         try {
             final List<Row<T>> rows = new ArrayList<>();
             while (rs.next()) {
-                rows.add(new Row<T>(newInstance(klass, rs)));
+                rows.add(new Row<T>(em, newInstance(em.targetClass(), rs)));
             }
             return new RowList<T>(rows);
         }
@@ -64,7 +66,12 @@ public class RowFactory {
         }
         
         public Field get(final String fieldName) {
-            return fieldMap.get(fieldName);
+            for (final Map.Entry<String, Field> map : fieldMap.entrySet()) {
+                if (map.getKey().toLowerCase().equals(fieldName.toLowerCase())) {
+                    return map.getValue();
+                }
+            }
+            return null;
         }
     }
     

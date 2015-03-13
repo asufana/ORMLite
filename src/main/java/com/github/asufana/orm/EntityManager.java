@@ -25,13 +25,21 @@ public class EntityManager<T> {
         this.klass = klass;
     }
     
+    public Connection connection() {
+        return connection;
+    }
+    
+    public Class<T> targetClass() {
+        return klass;
+    }
+    
     private void clearQueryParameters() {
         this.values = Collections.emptyMap();
         this.sql = null;
         this.sqlParams = Collections.emptyList();
     }
     
-    private String tableName() {
+    public String tableName() {
         return klass.getSimpleName();
     }
     
@@ -77,13 +85,10 @@ public class EntityManager<T> {
     }
     
     private String getPKColumnName() {
-        final Table table = new Inspection(connection).tables()
-                                                      .get(tableName())
-                                                      .get();
-        assert table != null : "テーブル情報が取得できません";
-        final ColumnList pkColumns = table.pkColumns();
-        assert pkColumns.size() != 1 : "現時点でPKカラム1つまでしか対応していない・・・。PK Column count:"
-                + pkColumns.size();
+        final ColumnList pkColumns = Inspection.pkColumns(connection,
+                                                          tableName());
+        assert pkColumns.size() != 1 : "複合主キーにはまだ未対応...";
+        
         return pkColumns.get(0).get().columnName();
     }
     
@@ -115,7 +120,7 @@ public class EntityManager<T> {
                                                                  tableName(),
                                                                  sql),
                                                    sqlParams,
-                                                   rs -> RowFactory.create(klass,
+                                                   rs -> RowFactory.create(this,
                                                                            rs));
         clearQueryParameters();
         return rows;
@@ -123,12 +128,14 @@ public class EntityManager<T> {
     
     //- DELETE ---------------------------------
     
-    public Integer delete() {
-        return Query.execute(connection,
-                             String.format("DELETE FROM %s WHERE %s",
-                                           tableName(),
-                                           sql),
-                             sqlParams);
+    Integer delete() {
+        final Integer deleteCount = Query.execute(connection,
+                                                  String.format("DELETE FROM %s WHERE %s",
+                                                                tableName(),
+                                                                sql),
+                                                  sqlParams);
+        clearQueryParameters();
+        return deleteCount;
     }
     
     //- UPDATE ---------------------------------

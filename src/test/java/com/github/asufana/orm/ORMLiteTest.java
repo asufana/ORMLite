@@ -17,6 +17,7 @@ import com.github.asufana.orm.functions.util.*;
 public class ORMLiteTest extends BaseTest {
     
     private final ORMLite orm = new ORMLite(connection);
+    private final EntityManager<Member> em = orm.on(Member.class);
     private final String tableName = "member";
     
     @Before
@@ -29,12 +30,8 @@ public class ORMLiteTest extends BaseTest {
         assertThat(Query.execute(connection, String.format("CREATE TABLE %s ("
                 + "id integer unsigned auto_increment primary key,"
                 + "name varchar(255) not null)", tableName)), is(0));
-        assertThat(new Inspection(connection).tables()
-                                             .get(tableName)
-                                             .isPresent(), is(true));
-        
-        //EntityManager
-        final EntityManager<Member> em = orm.on(Member.class);
+        assertThat(new Inspection(connection).tables().get(tableName),
+                   is(notNullValue()));
         
         //INSERT
         assertThat(em.count(), is(0));
@@ -53,7 +50,6 @@ public class ORMLiteTest extends BaseTest {
     
     @Test
     public void testSelect() {
-        final EntityManager<Member> em = orm.on(Member.class);
         final Row<Member> row = em.where("NAME=?", "foo").select();
         assertThat(row, is(notNullValue()));
         
@@ -65,7 +61,6 @@ public class ORMLiteTest extends BaseTest {
     
     @Test
     public void testSelectList() {
-        final EntityManager<Member> em = orm.on(Member.class);
         final RowList<Member> rows = em.where("NAME in (?,?)", "foo", "bar")
                                        .selectList();
         assertThat(rows, is(notNullValue()));
@@ -77,7 +72,6 @@ public class ORMLiteTest extends BaseTest {
     
     @Test
     public void testDelete() throws Exception {
-        final EntityManager<Member> em = orm.on(Member.class);
         assertThat(em.count(), is(2));
         final Integer deleteCount = em.where("NAME=?", "foo").delete();
         assertThat(deleteCount, is(1));
@@ -86,13 +80,25 @@ public class ORMLiteTest extends BaseTest {
         assertThat(em.where("NAME=?", "bar").select().get().name(), is("bar"));
     }
     
+    @Test
+    public void testDeleteFromRow() throws Exception {
+        assertThat(em.count(), is(2));
+        final Row<Member> row = em.where("NAME=?", "foo").select();
+        assertThat(row, is(notNullValue()));
+        
+        assertThat(row.delete(), is(1));
+        assertThat(em.count(), is(1));
+        
+        assertThat(em.where("NAME=?", "bar").select().get().name(), is("bar"));
+    }
+    
     @Getter
     public static class Member {
-        private final Integer id;
+        private final Integer iD;
         private final String name;
         
         public Member(final Integer id, final String name) {
-            this.id = id;
+            iD = id;
             this.name = name;
         }
     }
