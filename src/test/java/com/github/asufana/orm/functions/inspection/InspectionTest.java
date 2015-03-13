@@ -46,4 +46,13 @@ public class InspectionTest extends BaseTest {
         assertThat(columns.size(), is(2));
         columns.forEach(System.out::println);
     }
+    
+    @Test
+    public void testPkColumns() throws Exception {
+        final List<Table> tables = inspection.tables();
+        final Table table = tables.get(0);
+        final List<Column> columns = table.pkColumns();
+        assertThat(columns.size(), is(1));
+        columns.forEach(System.out::println);
+    }
 }

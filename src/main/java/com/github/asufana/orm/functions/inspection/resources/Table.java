@@ -51,7 +51,51 @@ public class Table {
                                            rs.getString("SCOPE_SCHEMA"),
                                            rs.getString("SCOPE_TABLE"),
                                            rs.getString("SOURCE_DATA_TYPE"),
-                                           rs.getString("IS_AUTOINCREMENT")));
+                                           rs.getString("IS_AUTOINCREMENT"),
+                                           (Short)null,
+                                           null));
+                }
+            }
+        }
+        catch (final Exception e) {
+            throw new ORMLiteException(e);
+        }
+        return columns.size() != 0
+                ? columns
+                : Collections.emptyList();
+    }
+    
+    public List<Column> pkColumns() {
+        final List<Column> columns = new ArrayList<>();
+        try {
+            try (ResultSet rs = meta.getPrimaryKeys(Inspection.CATALOG,
+                                                    Inspection.SCHEMA,
+                                                    tableName())) {
+                while (rs.next()) {
+                    //http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html#getPrimaryKeys(java.lang.String, java.lang.String, java.lang.String)
+                    columns.add(new Column(meta,
+                                           rs.getString("TABLE_CAT"),
+                                           rs.getString("TABLE_SCHEM"),
+                                           rs.getString("TABLE_NAME"),
+                                           rs.getString("COLUMN_NAME"),
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           null,
+                                           Short.valueOf(rs.getString("KEY_SEQ")),
+                                           rs.getString("PK_NAME")));
                 }
             }
         }

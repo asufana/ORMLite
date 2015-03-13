@@ -27,4 +27,6 @@ public class Column {
     private final String scopeTable;
     private final String sourceDataType;
     private final String isAutoincrement;
+    private final Short keySeq;
+    private final String pkName;
 }
