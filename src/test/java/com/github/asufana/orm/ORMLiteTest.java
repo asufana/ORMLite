@@ -89,16 +89,18 @@ public class ORMLiteTest extends BaseTest {
         assertThat(row.delete(), is(1));
         assertThat(em.count(), is(1));
         
-        assertThat(em.where("NAME=?", "bar").select().get().name(), is("bar"));
+        final Member member = em.where("NAME=?", "bar").select().get();
+        assertThat(em.toRow(member).delete(), is(1));
+        assertThat(em.count(), is(0));
     }
     
     @Getter
     public static class Member {
-        private final Integer iD;
+        private final Integer id;
         private final String name;
         
         public Member(final Integer id, final String name) {
-            iD = id;
+            this.id = id;
             this.name = name;
         }
     }

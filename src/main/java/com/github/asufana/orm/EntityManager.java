@@ -43,6 +43,10 @@ public class EntityManager<T> {
         return klass.getSimpleName();
     }
     
+    public Row<T> toRow(final T instance) {
+        return new Row<T>(this, instance);
+    }
+    
     //- COUNT ---------------------------------
     
     public Integer count() {
