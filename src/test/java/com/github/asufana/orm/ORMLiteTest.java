@@ -75,6 +75,17 @@ public class ORMLiteTest extends BaseTest {
         assertThat(members.size(), is(2));
     }
     
+    @Test
+    public void testDelete() throws Exception {
+        final EntityManager<Member> em = orm.on(Member.class);
+        assertThat(em.count(), is(2));
+        final Integer deleteCount = em.where("NAME=?", "foo").delete();
+        assertThat(deleteCount, is(1));
+        assertThat(em.count(), is(1));
+        
+        assertThat(em.where("NAME=?", "bar").select().get().name(), is("bar"));
+    }
+    
     @Getter
     public static class Member {
         private final Integer id;

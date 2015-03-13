@@ -123,6 +123,14 @@ public class EntityManager<T> {
     
     //- DELETE ---------------------------------
     
+    public Integer delete() {
+        return Query.execute(connection,
+                             String.format("DELETE FROM %s WHERE %s",
+                                           tableName(),
+                                           sql),
+                             sqlParams);
+    }
+    
     //- UPDATE ---------------------------------
     
 }
