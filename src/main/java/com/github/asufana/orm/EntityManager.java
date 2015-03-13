@@ -7,6 +7,7 @@ import java.util.stream.*;
 import org.apache.commons.lang3.*;
 
 import com.github.asufana.orm.functions.query.*;
+import com.github.asufana.orm.functions.query.Query.ExecuteResult;
 
 public class EntityManager<T> {
     
@@ -52,12 +53,16 @@ public class EntityManager<T> {
     }
     
     public void insert() {
-        Query.execute(connection,
-                      String.format("INSERT INTO %s (%s) VALUES (%s)",
-                                    tableName(),
-                                    insertColumns(),
-                                    insertValues()));
+        final ExecuteResult result = Query.executeInsert(connection,
+                                                         String.format("INSERT INTO %s (%s) VALUES (%s)",
+                                                                       tableName(),
+                                                                       insertColumns(),
+                                                                       insertValues()));
         clearQueryParameters();
+        assert result.executedCount == 1;
+        
+        //TODO select
+        System.out.println("###########" + result.generatedId);
     }
     
     private String insertColumns() {

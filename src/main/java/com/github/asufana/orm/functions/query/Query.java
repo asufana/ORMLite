@@ -3,6 +3,8 @@ package com.github.asufana.orm.functions.query;
 import java.sql.*;
 import java.util.*;
 
+import lombok.*;
+
 import com.github.asufana.orm.exceptions.*;
 
 public class Query {
@@ -15,13 +17,48 @@ public class Query {
                                   final String sql,
                                   final List<Object> params) {
         try (PreparedStatement prepareStatement = connection.prepareStatement(sql)) {
-            final PreparedStatement paramdPreparedStatement = setParameters(prepareStatement,
-                                                                            params);
-            return paramdPreparedStatement.executeUpdate();
+            final PreparedStatement paramedPreparedStatement = setParameters(prepareStatement,
+                                                                             params);
+            return paramedPreparedStatement.executeUpdate();
         }
         catch (final SQLException e) {
             throw new ORMLiteException(e, sql);
         }
+    }
+    
+    public static ExecuteResult executeInsert(final Connection connection,
+                                              final String sql) {
+        return executeInsert(connection, sql, Collections.emptyList());
+    }
+    
+    public static ExecuteResult executeInsert(final Connection connection,
+                                              final String sql,
+                                              final List<Object> params) {
+        try (PreparedStatement prepareStatement = connection.prepareStatement(sql,
+                                                                              Statement.RETURN_GENERATED_KEYS)) {
+            final PreparedStatement paramedPreparedStatement = setParameters(prepareStatement,
+                                                                             params);
+            final Integer executedCount = paramedPreparedStatement.executeUpdate();
+            final Long generatedId = getGeneratedId(paramedPreparedStatement);
+            return new ExecuteResult(executedCount, generatedId);
+        }
+        catch (final SQLException e) {
+            throw new ORMLiteException(e, sql);
+        }
+    }
+    
+    private static Long getGeneratedId(final PreparedStatement paramdPreparedStatement) throws SQLException {
+        final ResultSet generatedKeys = paramdPreparedStatement.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            return generatedKeys.getLong(1);
+        }
+        return null;
+    }
+    
+    @Value
+    public static class ExecuteResult {
+        public final Integer executedCount;
+        public final Long generatedId;
     }
     
     private static PreparedStatement setParameters(final PreparedStatement prepareStatement,
