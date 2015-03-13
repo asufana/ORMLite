@@ -38,10 +38,16 @@ public class ORMLiteTest extends BaseTest {
         
         //INSERT
         assertThat(em.count(), is(0));
-        em.values(new MapBuilder<String, String>().put("name", "foo").build())
-          .insert();
-        em.values(new MapBuilder<String, String>().put("name", "bar").build())
-          .insert();
+        final Row<Member> row01 = em.values(new MapBuilder<String, String>().put("name",
+                                                                                 "foo")
+                                                                            .build())
+                                    .insert();
+        assertThat(row01.get().name(), is("foo"));
+        final Row<Member> row02 = em.values(new MapBuilder<String, String>().put("name",
+                                                                                 "bar")
+                                                                            .build())
+                                    .insert();
+        assertThat(row02.get().name(), is("bar"));
         assertThat(em.count(), is(2));
     }
     

@@ -6,6 +6,8 @@ import java.util.stream.*;
 
 import org.apache.commons.lang3.*;
 
+import com.github.asufana.orm.functions.inspection.*;
+import com.github.asufana.orm.functions.inspection.resources.*;
 import com.github.asufana.orm.functions.mapping.*;
 import com.github.asufana.orm.functions.query.*;
 import com.github.asufana.orm.functions.query.Query.ExecuteResult;
@@ -61,7 +63,7 @@ public class EntityManager<T> {
         return this;
     }
     
-    public void insert() {
+    public Row<T> insert() {
         final ExecuteResult result = Query.executeInsert(connection,
                                                          String.format("INSERT INTO %s (%s) VALUES (%s)",
                                                                        tableName(),
@@ -70,8 +72,19 @@ public class EntityManager<T> {
         clearQueryParameters();
         assert result.executedCount == 1;
         
-        //TODO select
-        System.out.println("###########" + result.generatedId);
+        final String pkColumnName = getPKColumnName();
+        return where(String.format("%s=?", pkColumnName), result.generatedId).select();
+    }
+    
+    private String getPKColumnName() {
+        final Table table = new Inspection(connection).tables()
+                                                      .get(tableName())
+                                                      .get();
+        assert table != null : "テーブル情報が取得できません";
+        final ColumnList pkColumns = table.pkColumns();
+        assert pkColumns.size() != 1 : "現時点でPKカラム1つまでしか対応していない・・・。PK Column count:"
+                + pkColumns.size();
+        return pkColumns.get(0).get().columnName();
     }
     
     private String insertColumns() {
