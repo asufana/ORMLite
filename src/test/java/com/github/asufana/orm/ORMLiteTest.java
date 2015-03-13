@@ -2,11 +2,15 @@ package com.github.asufana.orm;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+
+import java.util.*;
+
 import lombok.*;
 
 import org.junit.*;
 
 import com.github.asufana.orm.functions.inspection.*;
+import com.github.asufana.orm.functions.mapping.*;
 import com.github.asufana.orm.functions.query.*;
 import com.github.asufana.orm.functions.util.*;
 
@@ -39,6 +43,30 @@ public class ORMLiteTest extends BaseTest {
         em.values(new MapBuilder<String, String>().put("name", "bar").build())
           .insert();
         assertThat(em.count(), is(2));
+    }
+    
+    @Test
+    public void testSelect() {
+        final EntityManager<Member> em = orm.on(Member.class);
+        final Row<Member> row = em.where("NAME=?", "foo").select();
+        assertThat(row, is(notNullValue()));
+        
+        final Member member = row.get();
+        assertThat(member.name(), is("foo"));
+        
+        assertThat(em.where("NAME=?", "bar").select().get().name(), is("bar"));
+    }
+    
+    @Test
+    public void testSelectList() {
+        final EntityManager<Member> em = orm.on(Member.class);
+        final RowList<Member> rows = em.where("NAME in (?,?)", "foo", "bar")
+                                       .selectList();
+        assertThat(rows, is(notNullValue()));
+        
+        final List<Member> members = rows.toList();
+        assertThat(members, is(notNullValue()));
+        assertThat(members.size(), is(2));
     }
     
     @Getter
