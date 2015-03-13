@@ -3,8 +3,6 @@ package com.github.asufana.orm.functions.inspection;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.util.*;
-
 import org.junit.*;
 
 import com.github.asufana.orm.*;
@@ -37,8 +35,8 @@ public class InspectionTest extends BaseTest {
     @Test
     public void testColumns() throws Exception {
         final TableList tables = inspection.tables();
-        final Table table = tables.get(0).get();
-        final List<Column> columns = table.columns();
+        final Table table = tables.get(tableName).get();
+        final ColumnList columns = table.columns();
         assertThat(columns.size(), is(2));
         columns.forEach(System.out::println);
     }
@@ -46,8 +44,8 @@ public class InspectionTest extends BaseTest {
     @Test
     public void testPkColumns() throws Exception {
         final TableList tables = inspection.tables();
-        final Table table = tables.get(0).get();
-        final List<Column> columns = table.pkColumns();
+        final Table table = tables.get(tableName).get();
+        final ColumnList columns = table.pkColumns();
         assertThat(columns.size(), is(1));
         columns.forEach(System.out::println);
     }

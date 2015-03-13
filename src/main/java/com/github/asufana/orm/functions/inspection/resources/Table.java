@@ -22,7 +22,7 @@ public class Table {
     private final String selfReferencingColName;
     private final String refGeneration;
     
-    public List<Column> columns() {
+    public ColumnList columns() {
         final List<Column> columns = new ArrayList<>();
         try {
             try (ResultSet rs = meta.getColumns(Inspection.CATALOG,
@@ -52,7 +52,7 @@ public class Table {
                                            rs.getString("SCOPE_TABLE"),
                                            rs.getString("SOURCE_DATA_TYPE"),
                                            rs.getString("IS_AUTOINCREMENT"),
-                                           (Short)null,
+                                           (Short) null,
                                            null));
                 }
             }
@@ -61,11 +61,11 @@ public class Table {
             throw new ORMLiteException(e);
         }
         return columns.size() != 0
-                ? columns
-                : Collections.emptyList();
+                ? new ColumnList(columns)
+                : ColumnList.EMPTY;
     }
     
-    public List<Column> pkColumns() {
+    public ColumnList pkColumns() {
         final List<Column> columns = new ArrayList<>();
         try {
             try (ResultSet rs = meta.getPrimaryKeys(Inspection.CATALOG,
@@ -103,7 +103,7 @@ public class Table {
             throw new ORMLiteException(e);
         }
         return columns.size() != 0
-                ? columns
-                : Collections.emptyList();
+                ? new ColumnList(columns)
+                : ColumnList.EMPTY;
     }
 }
