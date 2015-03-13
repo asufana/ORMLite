@@ -16,7 +16,9 @@ public class InspectionTest extends BaseTest {
     
     @Before
     public void before() {
-        assertThat(Query.execute(connection, "DROP TABLE IF EXISTS x"), is(0));
+        assertThat(Query.execute(connection,
+                                 String.format("DROP TABLE IF EXISTS %s",
+                                               tableName)), is(0));
         assertThat(Query.execute(connection, String.format("CREATE TABLE %s ("
                 + "id integer unsigned auto_increment primary key,"
                 + "name varchar(255) not null)", tableName)), is(0));
