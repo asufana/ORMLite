@@ -25,11 +25,6 @@ public class InspectionTest extends BaseTest {
         inspection = new Inspection(connection);
     }
     
-    @After
-    public void after() {
-        inspection.closeConnection();
-    }
-    
     @Test
     public void testTables() {
         final List<Table> tables = inspection.tables();
