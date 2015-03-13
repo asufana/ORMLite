@@ -60,4 +60,12 @@ public class Inspection {
                 ? new TableList(tables)
                 : TableList.EMPTY;
     }
+    
+    public static ColumnList pkColumns(final Connection connection,
+                                       final String tableName) {
+        return new Inspection(connection).tables()
+                                         .get(tableName)
+                                         .map(table -> table.pkColumns())
+                                         .orElseThrow(() -> new ORMLiteException("Can't find table or Primary Key columns."));
+    }
 }
