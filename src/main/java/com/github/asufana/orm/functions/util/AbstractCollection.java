@@ -29,7 +29,13 @@ public abstract class AbstractCollection<T extends AbstractCollection, S> {
             final Type type = clazz.getGenericSuperclass();
             final ParameterizedType pt = (ParameterizedType) type;
             final Type[] actualTypeArguments = pt.getActualTypeArguments();
-            final Class<?> entityClass = (Class<?>) actualTypeArguments[0];
+            final Class<?> entityClass;
+            if (actualTypeArguments[0] instanceof ParameterizedType) {
+                entityClass = (Class<?>) ((ParameterizedType) actualTypeArguments[0]).getRawType();
+            }
+            else {
+                entityClass = (Class<?>) actualTypeArguments[0];
+            }
             final Constructor<?> constructor = entityClass.getConstructor(constructorParams);
             return (T) constructor.newInstance(list);
         }
