@@ -27,7 +27,7 @@ public class Inspection {
         }
     }
     
-    public List<Table> tables() {
+    public TableList tables() {
         final List<Table> tables = new ArrayList<>();
         try {
             try (final ResultSet rs = meta.getTables(CATALOG,
@@ -57,7 +57,7 @@ public class Inspection {
             throw new ORMLiteException(e);
         }
         return tables.size() != 0
-                ? tables
-                : Collections.<Table> emptyList();
+                ? new TableList(tables)
+                : TableList.EMPTY;
     }
 }
