@@ -13,6 +13,10 @@ public class ORMLiteException extends RuntimeException {
     private final String message;
     private final String sql;
     
+    public static ORMLiteException emptyParams() {
+        throw new ORMLiteException("Query or query parameters are empty.");
+    }
+    
     public ORMLiteException(final String message) {
         this(null, message, null);
     }

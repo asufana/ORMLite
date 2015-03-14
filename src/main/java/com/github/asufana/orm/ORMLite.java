@@ -12,8 +12,13 @@ public class ORMLite {
     private final Connection connection;
     
     public ORMLite(final Connection connection) {
-        if (connection == null) {
-            throw new ORMLiteException("No connection.");
+        try {
+            if (connection == null || connection.isClosed()) {
+                throw new ORMLiteException("No connection.");
+            }
+        }
+        catch (final SQLException e) {
+            throw new ORMLiteException(e);
         }
         this.connection = connection;
     }

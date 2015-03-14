@@ -9,6 +9,7 @@ import lombok.*;
 
 import org.junit.*;
 
+import com.github.asufana.orm.exceptions.*;
 import com.github.asufana.orm.functions.inspection.*;
 import com.github.asufana.orm.functions.mapping.*;
 import com.github.asufana.orm.functions.query.*;
@@ -92,6 +93,27 @@ public class ORMLiteTest extends BaseTest {
         final Member member = em.where("NAME=?", "bar").select().get();
         assertThat(em.toRow(member).delete(), is(1));
         assertThat(em.count(), is(0));
+    }
+    
+    @Test
+    public void testEmptyParamater() throws Exception {
+        try {
+            em.insert();
+            fail();
+        }
+        catch (final ORMLiteException e) {}
+        
+        try {
+            em.select();
+            fail();
+        }
+        catch (final ORMLiteException e) {}
+        
+        try {
+            em.delete();
+            fail();
+        }
+        catch (final ORMLiteException e) {}
     }
     
     @Getter

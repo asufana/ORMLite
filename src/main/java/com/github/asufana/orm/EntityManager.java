@@ -6,6 +6,7 @@ import java.util.stream.*;
 
 import org.apache.commons.lang3.*;
 
+import com.github.asufana.orm.exceptions.*;
 import com.github.asufana.orm.functions.inspection.*;
 import com.github.asufana.orm.functions.inspection.resources.*;
 import com.github.asufana.orm.functions.mapping.*;
@@ -76,6 +77,11 @@ public class EntityManager<T> {
     }
     
     public Row<T> insert() {
+        if (StringUtils.isEmpty(tableName())
+                || values == null
+                || values.size() == 0) {
+            throw ORMLiteException.emptyParams();
+        }
         final ExecuteResult result = Query.executeInsert(connection,
                                                          String.format("INSERT INTO %s (%s) VALUES (%s)",
                                                                        tableName(),
@@ -119,6 +125,12 @@ public class EntityManager<T> {
     }
     
     public RowList<T> selectList() {
+        if (StringUtils.isEmpty(tableName())
+                || StringUtils.isEmpty(sql)
+                || sqlParams == null
+                || sqlParams.size() == 0) {
+            throw ORMLiteException.emptyParams();
+        }
         final RowList<T> rows = Query.executeQuery(connection,
                                                    String.format("SELECT * FROM %s WHERE %s",
                                                                  tableName(),
@@ -133,6 +145,11 @@ public class EntityManager<T> {
     //- DELETE ---------------------------------
     
     Integer delete() {
+        if (StringUtils.isEmpty(sql)
+                || sqlParams == null
+                || sqlParams.size() == 0) {
+            throw ORMLiteException.emptyParams();
+        }
         final Integer deleteCount = Query.execute(connection,
                                                   String.format("DELETE FROM %s WHERE %s",
                                                                 tableName(),
