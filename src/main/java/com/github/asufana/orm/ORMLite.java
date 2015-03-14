@@ -9,9 +9,6 @@ import com.github.asufana.orm.exceptions.*;
 @Getter
 public class ORMLite {
     
-    //TODO checkstyle
-    //TODO findbugs
-    
     private final Connection connection;
     
     public ORMLite(final Connection connection) {

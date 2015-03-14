@@ -9,6 +9,7 @@ import lombok.*;
 import com.github.asufana.orm.*;
 import com.github.asufana.orm.exceptions.*;
 import com.github.asufana.orm.functions.inspection.*;
+import com.github.asufana.orm.functions.inspection.resources.*;
 import com.github.asufana.orm.functions.query.*;
 
 @Getter
@@ -40,6 +41,8 @@ public class Row<T> {
         return Optional.ofNullable(instance).orElseThrow(exception);
     }
     
+    //-----------------------------------------
+    
     public Integer delete() {
         return Query.execute(em.connection(),
                              String.format("DELETE FROM %s WHERE %s=?",
@@ -49,33 +52,33 @@ public class Row<T> {
     }
     
     private String pkColumnName() {
-        return Inspection.pkColumns(em.connection(), em.tableName())
-                         .get(0)
-                         .get()
-                         .columnName();
+        final ColumnList pkColumns = Inspection.pkColumns(em.connection(),
+                                                          em.tableName());
+        assert pkColumns.size() == 1 : "複合主キーにはまだ未対応...";
+        return pkColumns.get(0).get().columnName();
     }
     
     private Object pkFieldValue() {
         try {
             final String pkColumnName = pkColumnName();
-            final Field field = Arrays.asList(em.targetClass()
-                                                .getDeclaredFields())
-                                      .stream()
-                                      .filter(f -> f.getName()
-                                                    .toLowerCase()
-                                                    .equals(pkColumnName.toLowerCase()))
-                                      .findFirst()
-                                      .orElseThrow(() -> new ORMLiteException(String.format("Can't find PK Field on Target Class. Target Class:%s, PK Field:%s",
-                                                                                            em.targetClass()
-                                                                                              .getSimpleName(),
-                                                                                            pkColumnName)));
-            field.setAccessible(true);
-            final Object pkFieldValue = field.get(instance);
+            final Field pkField = Arrays.asList(em.targetClass()
+                                                  .getDeclaredFields())
+                                        .stream()
+                                        .filter(f -> f.getName()
+                                                      .toLowerCase()
+                                                      .equals(pkColumnName.toLowerCase()))
+                                        .findFirst()
+                                        .orElseThrow(() -> new ORMLiteException(String.format("Can't find PK Field on Target Class. Target Class:%s, PK Field:%s",
+                                                                                              em.targetClass()
+                                                                                                .getSimpleName(),
+                                                                                              pkColumnName)));
+            pkField.setAccessible(true);
+            final Object pkFieldValue = pkField.get(instance);
             if (pkFieldValue == null) {
                 throw new ORMLiteException(String.format("Can't get PK Field value on Target Class. Target Class:%s, PK Field:%s",
                                                          em.targetClass()
                                                            .getSimpleName(),
-                                                         field.getName()));
+                                                         pkField.getName()));
             }
             return pkFieldValue;
         }
