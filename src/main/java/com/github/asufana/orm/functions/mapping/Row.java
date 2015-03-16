@@ -47,7 +47,7 @@ public class Row<T> {
                              String.format("DELETE FROM %s WHERE %s=?",
                                            em.tableName(),
                                            pkColumnName),
-                             Arrays.asList(PrimaryKeyFunction.pkFieldValue(pkColumnName,
+                             Arrays.asList(PrimaryKeyFunction.pkColumnValue(pkColumnName,
                                                                            instance)));
     }
 }

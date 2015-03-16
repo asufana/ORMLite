@@ -149,7 +149,7 @@ public class EntityManager<T> {
     private Row<T> selectByPK(final Row<T> instance) {
         final String pkColumnName = PrimaryKeyFunction.pkColumnName(connection,
                                                                     tableName());
-        final Object pkColumnValue = PrimaryKeyFunction.pkFieldValue(pkColumnName,
+        final Object pkColumnValue = PrimaryKeyFunction.pkColumnValue(pkColumnName,
                                                                      instance.get());
         return where(String.format("%s=?", pkColumnName), pkColumnValue).select();
     }
@@ -185,7 +185,7 @@ public class EntityManager<T> {
                 || sqlParams.size() == 0) {
             throw ORMLiteException.emptyParams();
         }
-        //check count
+        //TODO check count
         
         final Row<T> instance = copyThis().where(sql, sqlParams).select();
         final Integer updateCount = Query.execute(connection,

@@ -17,8 +17,8 @@ public class PrimaryKeyFunction {
         return pkColumns.get(0).get().columnName();
     }
     
-    public static <T> Object pkFieldValue(final String pkColumnName,
-                                          final T instance) {
+    public static <T> Object pkColumnValue(final String pkColumnName,
+                                           final T instance) {
         try {
             final Field pkField = Arrays.asList(instance.getClass()
                                                         .getDeclaredFields())
