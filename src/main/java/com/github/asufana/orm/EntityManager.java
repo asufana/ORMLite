@@ -7,13 +7,14 @@ import java.util.stream.*;
 import org.apache.commons.lang3.*;
 
 import com.github.asufana.orm.exceptions.*;
-import com.github.asufana.orm.functions.inspection.*;
-import com.github.asufana.orm.functions.inspection.resources.*;
 import com.github.asufana.orm.functions.mapping.*;
 import com.github.asufana.orm.functions.query.*;
 import com.github.asufana.orm.functions.query.Query.ExecuteResult;
+import com.github.asufana.orm.functions.util.*;
 
 public class EntityManager<T> {
+    
+    //TODO transaction
     
     private final Connection connection;
     private final Class<T> klass;
@@ -24,6 +25,10 @@ public class EntityManager<T> {
     EntityManager(final Connection connection, final Class<T> klass) {
         this.connection = connection;
         this.klass = klass;
+    }
+    
+    private EntityManager<T> copyThis() {
+        return new ORMLite(connection).on(klass);
     }
     
     public Connection connection() {
@@ -90,16 +95,9 @@ public class EntityManager<T> {
         clearQueryParameters();
         assert result.executedCount == 1;
         
-        final String pkColumnName = getPKColumnName();
+        final String pkColumnName = PrimaryKeyFunction.pkColumnName(connection,
+                                                                    tableName());
         return where(String.format("%s=?", pkColumnName), result.generatedId).select();
-    }
-    
-    private String getPKColumnName() {
-        final ColumnList pkColumns = Inspection.pkColumns(connection,
-                                                          tableName());
-        assert pkColumns.size() != 1 : "複合主キーにはまだ未対応...";
-        
-        return pkColumns.get(0).get().columnName();
     }
     
     private String insertColumns() {
@@ -114,9 +112,15 @@ public class EntityManager<T> {
     
     //- SELECT ---------------------------------
     
+    @SuppressWarnings("unchecked")
     public EntityManager<T> where(final String sql, final Object... params) {
         this.sql = sql;
-        this.sqlParams = Arrays.asList(params);
+        if (params.length == 1 && params[0] instanceof List<?>) {
+            this.sqlParams = (List<Object>) params[0];
+        }
+        else {
+            this.sqlParams = Arrays.asList(params);
+        }
         return this;
     }
     
@@ -142,6 +146,14 @@ public class EntityManager<T> {
         return rows;
     }
     
+    private Row<T> selectByPK(final Row<T> instance) {
+        final String pkColumnName = PrimaryKeyFunction.pkColumnName(connection,
+                                                                    tableName());
+        final Object pkColumnValue = PrimaryKeyFunction.pkFieldValue(pkColumnName,
+                                                                     instance.get());
+        return where(String.format("%s=?", pkColumnName), pkColumnValue).select();
+    }
+    
     //- DELETE ---------------------------------
     
     Integer delete() {
@@ -150,15 +162,51 @@ public class EntityManager<T> {
                 || sqlParams.size() == 0) {
             throw ORMLiteException.emptyParams();
         }
+        //TODO count check
+        
         final Integer deleteCount = Query.execute(connection,
                                                   String.format("DELETE FROM %s WHERE %s",
                                                                 tableName(),
                                                                 sql),
                                                   sqlParams);
         clearQueryParameters();
+        assert deleteCount == 1;
         return deleteCount;
     }
     
     //- UPDATE ---------------------------------
+    
+    public Row<T> update() {
+        if (StringUtils.isEmpty(tableName())
+                || values == null
+                || values.size() == 0
+                || StringUtils.isEmpty(sql)
+                || sqlParams == null
+                || sqlParams.size() == 0) {
+            throw ORMLiteException.emptyParams();
+        }
+        //check count
+        
+        final Row<T> instance = copyThis().where(sql, sqlParams).select();
+        final Integer updateCount = Query.execute(connection,
+                                                  String.format("UPDATE %s SET %s WHERE %s",
+                                                                tableName(),
+                                                                updateValues(),
+                                                                sql),
+                                                  sqlParams);
+        clearQueryParameters();
+        assert updateCount == 1;
+        
+        return selectByPK(instance);
+    }
+    
+    private String updateValues() {
+        return values.entrySet()
+                     .stream()
+                     .map(e -> String.format("%s='%s'",
+                                             e.getKey(),
+                                             e.getValue()))
+                     .collect(Collectors.joining(","));
+    }
     
 }
