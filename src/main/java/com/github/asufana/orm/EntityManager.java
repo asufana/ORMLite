@@ -162,7 +162,7 @@ public class EntityManager<T> {
                 || sqlParams.size() == 0) {
             throw ORMLiteException.emptyParams();
         }
-        //TODO count check
+        checkTargetRecordCount();
         
         final Integer deleteCount = Query.execute(connection,
                                                   String.format("DELETE FROM %s WHERE %s",
@@ -172,6 +172,16 @@ public class EntityManager<T> {
         clearQueryParameters();
         assert deleteCount == 1;
         return deleteCount;
+    }
+    
+    private void checkTargetRecordCount() {
+        final Integer targetCount = count(sql, sqlParams);
+        if (targetCount == 0) {
+            throw new ORMLiteException("対象のレコードが存在しません");
+        }
+        else if (targetCount > 1) {
+            throw new ORMLiteException("1件以上の対象が存在します");
+        }
     }
     
     //- UPDATE ---------------------------------
@@ -185,7 +195,7 @@ public class EntityManager<T> {
                 || sqlParams.size() == 0) {
             throw ORMLiteException.emptyParams();
         }
-        //TODO check count
+        checkTargetRecordCount();
         
         final Row<T> instance = copyThis().where(sql, sqlParams).select();
         final Integer updateCount = Query.execute(connection,

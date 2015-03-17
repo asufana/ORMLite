@@ -95,6 +95,18 @@ public class ORMLiteTest extends BaseTest {
         assertThat(em.count(), is(0));
     }
     
+    @Test(expected = ORMLiteException.class)
+    public void testDeleteTargetRecordCountException01() throws Exception {
+        assertThat(em.count(), is(2));
+        em.where("NAME=?", "XXXXXXXX").delete();
+    }
+    
+    @Test(expected = ORMLiteException.class)
+    public void testDeleteTargetRecordCountException02() throws Exception {
+        assertThat(em.count(), is(2));
+        em.where("NAME in (?,?)", "foo", "bar").delete();
+    }
+    
     @Test
     public void testUpdate() throws Exception {
         assertThat(em.count(), is(2));
@@ -114,6 +126,22 @@ public class ORMLiteTest extends BaseTest {
                                                                                   .build())
                                           .update();
         assertThat(updatedRow.get().name(), is("foo2"));
+    }
+    
+    @Test(expected = ORMLiteException.class)
+    public void testUpdateTargetRecordCountException01() throws Exception {
+        assertThat(em.count(), is(2));
+        em.where("NAME=?", "XXXXXXXXX")
+          .values(new MapBuilder<String, String>().put("name", "foo2").build())
+          .update();
+    }
+    
+    @Test(expected = ORMLiteException.class)
+    public void testUpdateTargetRecordCountException02() throws Exception {
+        assertThat(em.count(), is(2));
+        em.where("NAME in (?,?)", "foo", "bar")
+          .values(new MapBuilder<String, String>().put("name", "foo2").build())
+          .update();
     }
     
     @Test
