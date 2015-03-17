@@ -15,6 +15,8 @@ import com.github.asufana.orm.functions.util.*;
 public class EntityManager<T> {
     
     //TODO transaction
+    //TODO fix exception message
+    //TODO fix exception constructor
     
     private final Connection connection;
     private final Class<T> klass;
