@@ -150,13 +150,13 @@ public class EntityManager<T> {
         final String pkColumnName = PrimaryKeyFunction.pkColumnName(connection,
                                                                     tableName());
         final Object pkColumnValue = PrimaryKeyFunction.pkColumnValue(pkColumnName,
-                                                                     instance.get());
+                                                                      instance.get());
         return where(String.format("%s=?", pkColumnName), pkColumnValue).select();
     }
     
     //- DELETE ---------------------------------
     
-    Integer delete() {
+    public Integer delete() {
         if (StringUtils.isEmpty(sql)
                 || sqlParams == null
                 || sqlParams.size() == 0) {

@@ -6,7 +6,6 @@ import java.util.function.*;
 import lombok.*;
 
 import com.github.asufana.orm.*;
-import com.github.asufana.orm.functions.query.*;
 import com.github.asufana.orm.functions.util.*;
 
 @Getter
@@ -38,16 +37,26 @@ public class Row<T> {
         return Optional.ofNullable(instance).orElseThrow(exception);
     }
     
+    private String pkColumnName() {
+        return PrimaryKeyFunction.pkColumnName(em.connection(), em.tableName());
+    }
+    
     //-----------------------------------------
     
     public Integer delete() {
-        final String pkColumnName = PrimaryKeyFunction.pkColumnName(em.connection(),
-                                                                    em.tableName());
-        return Query.execute(em.connection(),
-                             String.format("DELETE FROM %s WHERE %s=?",
-                                           em.tableName(),
-                                           pkColumnName),
-                             Arrays.asList(PrimaryKeyFunction.pkColumnValue(pkColumnName,
-                                                                           instance)));
+        return where().delete();
     }
+    
+    public EntityManager<T> values(final Map<String, String> values) {
+        return where().values(values);
+    }
+    
+    private EntityManager<T> where() {
+        final String pkColumnName = pkColumnName();
+        final Object pkColumnValue = PrimaryKeyFunction.pkColumnValue(pkColumnName,
+                                                                      instance);
+        return em.where(String.format("%s=?", pkColumnName),
+                        Arrays.asList(pkColumnValue));
+    }
+    
 }

@@ -107,6 +107,16 @@ public class ORMLiteTest extends BaseTest {
     }
     
     @Test
+    public void testUpdateFromRow() throws Exception {
+        final Row<Member> row = em.where("NAME=?", "foo").select();
+        final Row<Member> updatedRow = row.values(new MapBuilder<String, String>().put("name",
+                                                                                       "foo2")
+                                                                                  .build())
+                                          .update();
+        assertThat(updatedRow.get().name(), is("foo2"));
+    }
+    
+    @Test
     public void testEmptyParamater() throws Exception {
         try {
             em.insert();
