@@ -33,6 +33,12 @@ Example model class:
     EntityManager<Member> em = new ORMLite(connection).on(Member.class);
 ```                                              
 
+### Count
+
+```
+    Integer count = em.count();
+```
+
 ### Insert
 
 ```
@@ -41,30 +47,40 @@ Example model class:
     Member member = row.get();
 ```
 
-### Count
-
-```
-    assertThat(em.count(), is(0));
-    em.values(insertValues).insert();
-    assertThat(em.count(), is(1));
-```
-
 ### Select
 
 ```
+    // Select a record
     Row<Member> row = em.where("NAME=?", "foo").select();
     Member member = row.get();
     
+    // Select list
     RowList<Member> rows = em.where("NAME in (?,?)", "foo", "bar").selectList();
     List<Member> members = rows.toList();
+```
+
+### Update
+
+```
+    Map<String, String> updateValues = new MapBuilder<String, String>().put("name", "foo2").build();
+
+    // Update Row
+    Row<Member> row = em.where("NAME=?", "foo").select();
+    row.values(updateValues).update();
+
+    // Update Object
+    Member member = em.where("NAME=?", "foo").select().get();
+    em.toRow(member).values(updateValues).update();
 ```
 
 ### Delete
 
 ```
+    // Delete Row
     Row<Member> row = em.where("NAME=?", "foo").select();
     row.delete();
     
+    // Delete Object
     Member member = em.where("NAME=?", "bar").select().get();
     em.toRow(member).delete();
 ```
