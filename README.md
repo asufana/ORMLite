@@ -2,8 +2,6 @@
 
 # ORMLite
 
-[![Build Status](https://travis-ci.org/asufana/ORMLite.svg?branch=master)](https://travis-ci.org/asufana/ORMLite)
-
 Tiny Object-relational mapping tool.
 
 
@@ -84,3 +82,29 @@ Example model class:
     Member member = em.where("NAME=?", "bar").select().get();
     em.toRow(member).delete();
 ```
+
+
+## Install
+
+
+```xml:pom.xml
+<dependencies>
+    <dependency>
+        <groupId>com.github.asufana</groupId>
+        <artifactId>ORMLite</artifactId>
+        <version>1.0</version>
+    </dependency>
+</dependencies>
+
+<repositories>
+    <repository>
+        <id>ORMLite</id>
+        <url>https://raw.github.com/asufana/ORMLite/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
+```
+
